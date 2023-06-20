@@ -1,9 +1,17 @@
-import { TextField, Button, Container, Box, Input } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Container,
+  Box,
+  Input,
+} from "@mui/material";
 import axios from "axios";
 import React, { FC, useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 
 const Form: FC = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -24,20 +32,53 @@ const Form: FC = () => {
       aboutMe: "",
     });
     const fileId = document.getElementById("fileUpload");
-    fileId.value = "";
+    if (fileId) {
+      fileId.value = "";
+    }
   };
 
+  const validateInput = (input) => {
+    const regex = /^[A-Za-z]+$/;
+    return regex.test(input);
+  };
   const handleChange = (e) => {
-    if (e.target.name === "file") {
-      const file = e.target.files[0];
+    const { name, value, type, files } = e.target;
+
+    if (name === "file") {
+      const file = files[0];
       setFormData((prevFormData) => ({
         ...prevFormData,
         file,
       }));
+    } else if (
+      name !== "agentLicence" &&
+      name !== "address" &&
+      name !== "practiceAreas" &&
+      name !== "aboutMe" &&
+      type === "text"
+    ) {
+      if (!validateInput(value) && value !== "") {
+        alert("only string characters are allowed!");
+        return;
+      }
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value,
+      }));
+    } else if (name === "agentLicence" && type === "text") {
+      const validNumber = /^[0-9]*$/;
+      if (!validNumber.test(value)) {
+        alert("only numbers are allowed!");
+        return;
+      }
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value,
+      }));
     } else {
       setFormData((prevFormData) => ({
         ...prevFormData,
-        [e.target.name]: e.target.value,
+        [name]: value,
       }));
     }
   };
@@ -61,15 +102,15 @@ const Form: FC = () => {
         },
       });
       clearFields();
+      navigate("/");
     } catch (error) {
-      console.error(error);
-      // Handle error
+      alert(error.message);
     }
   };
 
   return (
     <Container maxWidth="sm">
-      <Box mt={3}>
+      <Box mt={3} mb={5}>
         <form onSubmit={handleSubmit} encType="multipart/form-data">
           <TextField
             name="firstName"
@@ -99,8 +140,10 @@ const Form: FC = () => {
             fullWidth
             margin="normal"
             type="text"
+            step="1"
             required
           />
+
           <TextField
             name="address"
             label="Address"

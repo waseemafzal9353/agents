@@ -33,7 +33,7 @@ const Agent: FC = () => {
       setAgentReviews(agentReviews);
     }
     fetchAgentData();
-  }, []);
+  }, [review]);
 
   const handleReview = (e: { preventDefault: () => void }) => {
     e.preventDefault();

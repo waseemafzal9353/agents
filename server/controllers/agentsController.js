@@ -74,7 +74,7 @@ const getSingleAgent = async (req, res) => {
     const { practiceAreas } = req.query;
     try {
       const agentsSearched = await Agent.findAll({
-        where: { practiceAreas: { [Op.like]: `${practiceAreas}%` } },
+        where: { practiceAreas: { [Op.like]: `%${practiceAreas}%` } },
       });
       if (agentsSearched.length === 0)
         return errorHandler(res, 404, "Oops no agent against this search");
